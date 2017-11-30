@@ -93,13 +93,13 @@ def normalize_values(npImage):
     return npImage
 
 # Get list of image files
-inputPath = "datasets/nodules/scans_unprocessed/"
-outputPath = "datasets/nodules/scans_processed/"
+inputPath = "/media/amos/My Passport/Data/luna/"
+outputPath = "/media/amos/My Passport/Data/luna/nodules_dataset"
 annotationPath = "datasets/nodules/annotations/"
 targetSpacing = np.array([1.25, 1, 1])
 
 # For each subset
-for i in range(1,1):
+for i in range(0,9):
     print("subset" + str(i))
     subsetPath = inputPath + "subset" + str(i) + "/"
     fileList = glob(subsetPath + "*.mhd")

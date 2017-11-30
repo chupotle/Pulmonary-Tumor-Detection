@@ -4,6 +4,7 @@ import ntpath
 import time
 from . import util
 from . import html
+from .animator3d import MedicalImageAnimator
 
 class Visualizer():
     def __init__(self, opt):
@@ -29,7 +30,8 @@ class Visualizer():
 
     # |visuals|: dictionary of images to display or save
     def display_current_results(self, visuals, epoch):
-        if self.display_id > 0: # show images in the browser
+        #if self.display_id > 0: # show images in the browser
+        if False:
             if self.display_single_pane_ncols > 0:
                 h, w = next(iter(visuals.values())).shape[:2]
                 table_css = """<style>
@@ -73,8 +75,13 @@ class Visualizer():
 
         if self.use_html: # save images to a html file
             for label, image_numpy in visuals.items():
-                img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
-                util.save_image(image_numpy, img_path)
+                if len(image_numpy.shape) == 4:
+                    img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.gif' % (epoch, label))
+                    animator = MedicalImageAnimator(image_numpy[0], [], 0, save=True)
+                    animate = animator.run(img_path)
+                else:
+                    img_path = os.path.join(self.img_dir, 'epoch%.3d_%s.png' % (epoch, label))
+                    util.save_image(image_numpy, img_path)
             # update website
             webpage = html.HTML(self.web_dir, 'Experiment name = %s' % self.name, reflesh=1)
             for n in range(epoch, 0, -1):
@@ -84,7 +91,7 @@ class Visualizer():
                 links = []
 
                 for label, image_numpy in visuals.items():
-                    img_path = 'epoch%.3d_%s.png' % (n, label)
+                    img_path = 'epoch%.3d_%s.gif' % (n, label)
                     ims.append(img_path)
                     txts.append(label)
                     links.append(img_path)
