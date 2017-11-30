@@ -14,8 +14,10 @@ def create_model(opt):
         assert(opt.dataset_mode == 'single')
         from .test_model import TestModel
         model = TestModel()
-    elif opt.model == 'pix2pix_nodule':
+    elif opt.model == 'pix2pix3d':
         assert(opt.dataset_mode == 'nodule')
+        from .pix2pix3d_model import Pix2Pix3dModel
+        model = Pix2Pix3dModel()
     else:
         raise ValueError("Model [%s] not recognized." % opt.model)
     model.initialize(opt)

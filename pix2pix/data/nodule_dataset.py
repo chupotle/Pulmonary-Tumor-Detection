@@ -17,7 +17,8 @@ class NoduleDataset(BaseDataset):
         self.scans_dir = os.path.join(opt.dataroot, "scans_processed")
         self.samples = pickle.load(open(self.pkl_file, 'rb'))[0]
 
-
+        random.shuffle(self.samples)
+        
         self.scans = {}
         self.heatmaps = {}
 
