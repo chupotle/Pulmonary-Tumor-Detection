@@ -6,6 +6,7 @@ from data.base_dataset import BaseDataset
 #from data.image_folder import make_dataset
 import pickle
 import numpy as np
+import math
 
 
 class NoduleDataset(BaseDataset):
@@ -15,10 +16,14 @@ class NoduleDataset(BaseDataset):
         self.pkl_file = os.path.join(opt.dataroot, "crops.pkl")
         self.heatmaps_dir = os.path.join(opt.dataroot, "heatmaps/real")
         self.scans_dir = os.path.join(opt.dataroot, "scans_processed")
-        self.samples = pickle.load(open(self.pkl_file, 'rb'))[0]
+        self.samples = pickle.load(open(self.pkl_file, 'rb'))
+	self.val = self.samples[(math.floor(len(self.samples)*.6)):(math.floor{len(self.samples)*.6))]
+	self.samples = self.samples[0:(floor(len(self.samples)*.6))] # Train
+        self.samples = [j for i in self.samples for j in i]
 
         random.shuffle(self.samples)
         
+ 
         self.scans = {}
         self.heatmaps = {}
 
@@ -30,8 +35,8 @@ class NoduleDataset(BaseDataset):
 
         #load scan and heatmap if it hasnt already been loaded
         if not self.scans.has_key(sample['suid']):
-            self.scans[sample['suid']] = np.load(os.path.join(self.scans_dir, sample['suid'] + ".npz"))['a']
-            self.heatmaps[sample['suid']] = np.load(os.path.join(self.heatmaps_dir, sample['suid'] + ".npz"))['a']
+            self.scans[sample['suid']] = np.float32(np.load(os.path.join(self.scans_dir, sample['suid'] + ".npz"))['a'])
+            self.heatmaps[sample['suid']] = np.float32(np.load(os.path.join(self.heatmaps_dir, sample['suid'] + ".npz"))['a'])
         scan = self.scans[sample['suid']]
         heatmap = self.heatmaps[sample['suid']]
 
@@ -39,6 +44,8 @@ class NoduleDataset(BaseDataset):
         b = sample['bounds']
         scan_crop = scan[b[0]:b[3], b[1]:b[4], b[2]:b[5]]
         heatmap_crop = heatmap[b[0]:b[3], b[1]:b[4], b[2]:b[5]]
+        
+        print("cache size: " + str(len(scan_crop.keys())))
 
         #convert to torch tensors with dimension [channel, z, x, y]
         scan_crop = torch.from_numpy(scan_crop[None, :])
